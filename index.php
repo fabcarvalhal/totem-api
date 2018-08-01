@@ -21,6 +21,11 @@ Flight::route('GET /cursos', function(){
     Flight::Cursos()->getAll();
 });
 
+
+Flight::route('POST /inscrever', function(){
+    Flight::Inscricao()->inscrever(Flight::request()->data->getData());
+});
+
 Flight::start();
 
 
