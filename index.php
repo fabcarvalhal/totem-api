@@ -1,16 +1,24 @@
 <?php 
-require 'flight/Flight.php';
+
+require_once('app/flight/Flight.php');
+require_once('app/config.php');
+
 
 Flight::route('/', function(){
     echo 'Nenhuma rota especificada';
 });
 
 Flight::route('GET /eventos', function(){
-    include 'app/Eventos.php';
+    Flight::Eventos()->getAll();  
 });
 
-Flight::rout('POST /inscricao', function(){
-    include 'app/Inscricao.php';
+Flight::route('GET /instituicoes', function(){
+    Flight::Instituicoes()->getAll();  
+});
+
+
+Flight::route('GET /cursos', function(){
+    Flight::Cursos()->getAll();
 });
 
 Flight::start();

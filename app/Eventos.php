@@ -1,11 +1,18 @@
 <?php
-require_once('Conexao.php');
+class Eventos {
+    public static function getAll() {
+        try{
 
-$bd = new Conexao();
-$statement = $bd->prepare("SELECT * FROM Eventos");
-$statement->execute();
-$result = $statement->fetchAll(PDO::FETCH_OBJ);
-
-echo json_encode($result);
+            $Conexao    = Conexao::getConnection();
+            $query      = $Conexao->query("SELECT * FROM Eventos ");
+            $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
+            echo json_encode($eventos);
+        
+        }catch(Exception $e){
+            echo $e->getMessage();
+            exit;
+        }
+    }
+}
 
 ?>
