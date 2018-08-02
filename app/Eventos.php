@@ -14,6 +14,33 @@ class Eventos {
         }
     }
 
+    public static function checkStudentHasSubscribed($studentId,$eventName) {
+        $response = new StdClass();
+        $response->error = false;
+        $response->message = "";
+        try {
+            $conexao = Conexao::getConnection();
+            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM :eventname WHERE id = :id LIMIT 1");
+            $statement->bind_param(":eventname", $eventName, PDO::PARAM_STR);
+            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement->execute();
+            $result = $statement->fetch(PDO::FETCH_OBJ);
+
+            if($result->contagem > 0) {
+                $response->error = true;
+                $response->message = "Você já se inscreveu nesse evento.";
+                return $response;
+            }
+
+            $response->error = false;
+            return $response;
+        } catch(Exception $e) {
+            $response->error = true;
+            $response->message = "Erro ao checar se o aluno já se inscreveu";
+            return $response;
+        }
+    }
+
     public static function getEventNameById($id) {
         $response = new StdClass();
         $response->error = false;
