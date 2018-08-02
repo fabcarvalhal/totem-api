@@ -1,7 +1,9 @@
 <?php 
+include_once "DTO/AlunoDTO.php";
+
 class Inscricao {
     
-    private  $requiredKeys =  array('id_faculdade','id_curso','matricula','telefone','nome','id_evento');
+    private  $requiredKeys =  array('id_faculdade','id_curso','matricula','telefone','nome','id_evento','email');
 
     public function inscrever(array $input) {
         $validateInput = $this->validateInput($input);
@@ -28,27 +30,26 @@ class Inscricao {
             return;
         }
 
-        $getEventName = Eventos::getEventNameById($id);
+        $getEventName = Eventos::getEventNameById($inputAsObject->id_evento);
         if($getEventName->error) {
             echo json_encode($getEventName);
             return;
         }
 
-        $checkHasSubscribed = Eventos::checkStudentHasSubscribed($inputAsObject->matricula, $inputAsObject->id_evento);
+        $checkHasSubscribed = Eventos::checkStudentHasSubscribed($inputAsObject->matricula, $getEventName->eventName);
         if($checkHasSubscribed->error) {
             echo json_encode($checkHasSubscribed);
             return;
         }
 
         $validateStudent = Alunos::checkIfExists($inputAsObject->matricula);
-        $student = null;
         if($validateStudent->error == true) {
             $student = new AlunoDTO(
                 $inputAsObject->nome,
                 $inputAsObject->matricula,
                 $inputAsObject->telefone,
-                $inputAsObject->curso,
-                $inputAsObject->faculdade,
+                $inputAsObject->id_curso,
+                $inputAsObject->id_faculdade,
                 $inputAsObject->email
             );
 
@@ -59,15 +60,15 @@ class Inscricao {
             }
         }
 
-        $response = new StdClass90;
+        $response = new StdClass();
         $response->error = false;
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("INSERT INTO :tabela (aluno,nome_aluno,checkin,checkout) VALUES(:matricula,:nomealuno,0,0)");
-            $statement->bindValue(":tabela", $getEventName, PDO::PARAM_STR);
-            $statement->bindValue(":matricula", $student->matricula, PDO::PARAM_INT);
-            $statement->bindValue(":nomealuno", $student->nome, PDO::PARAM_STR);
+            $query = sprintf("INSERT INTO %s (aluno,nome_aluno,checkin,checkout) VALUES(:matricula,:nomealuno,0,0)", $getEventName->eventName);
+            $statement = $conexao->prepare($query);
+            $statement->bindValue(":matricula", $inputAsObject->matricula, PDO::PARAM_INT);
+            $statement->bindValue(":nomealuno", $inputAsObject->nome, PDO::PARAM_STR);
             $statement->execute();
 
             if($statement->rowCount() > 0) {
