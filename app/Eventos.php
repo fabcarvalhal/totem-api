@@ -14,6 +14,34 @@ class Eventos {
         }
     }
 
+    public static function getOne($id) {
+        $response = new StdClass();
+        $response->error = false;
+        $response->message = "";
+        try {
+            $conexao = Conexao::getConnection();
+            $statement = $conexao->prepare("SELECT nome,Convert(varchar(10),CONVERT(date,data,106),103) AS data, inicio,final FROM eventos WHERE id = :id order by id desc offset 0 rows fetch next 1 rows only");
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
+            $statement->execute();
+            $result = $statement->fetchAll(PDO::FETCH_OBJ);
+            
+            if($statement->rowCount() > 0) {
+                echo json_encode($result);
+                return;
+            }
+
+            $response->error = true;
+            $response->message = "O evento não existe.";
+            echo json_encode($response);
+            return;
+        } catch(Exception $e) {
+            $response->error = true;
+            $response->message = "Erro ao obter evento.";
+            echo json_encode($response);
+            return;
+        }
+    }
+
     public static function checkStudentHasSubscribed($studentId,$eventName) {
         $response = new StdClass();
         $response->error = false;

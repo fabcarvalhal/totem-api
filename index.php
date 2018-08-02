@@ -21,10 +21,15 @@ Flight::route('GET /cursos', function(){
     Flight::Cursos()->getAll();
 });
 
+Flight::route('GET /evento/@id', function($id){
+    Flight::Eventos()->getOne($id);
+});
 
 Flight::route('POST /inscrever', function(){
     Flight::Inscricao()->inscrever(Flight::request()->data->getData());
 });
+
+
 
 Flight::start();
 
