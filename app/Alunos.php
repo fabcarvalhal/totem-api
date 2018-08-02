@@ -10,7 +10,7 @@ class Alunos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM lunos WHERE matricula = :matricula");
-            $statement->bind_param(":matricula", $matricula, PDO::PARAM_INT);
+            $statement->bindValue(":matricula", $matricula, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -38,12 +38,12 @@ class Alunos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("INSERT INTO alunos(nome,email,telefone,matricula,curso,id_instituição) VALUES(:nome,:email,:telefone,:matricula,:curso,:faculdade)");
-            $statement->bind_param(":nome",$aluno->nome,PDO::PARAM_STR);
-            $statement->bind_param(":email",$aluno->email,PDO::PARAM_STR);
-            $statement->bind_param(":telefone",$aluno->telefone,PDO::PARAM_STR);
-            $statement->bind_param(":matricula",$aluno->matricula,PDO::PARAM_STR);
-            $statement->bind_param(":curso",$aluno->curso,PDO::PARAM_INT);
-            $statement->bind_param(":faculdade",$aluno->faculdade,PDO::PARAM_INT);
+            $statement->bindValue(":nome",$aluno->nome,PDO::PARAM_STR);
+            $statement->bindValue(":email",$aluno->email,PDO::PARAM_STR);
+            $statement->bindValue(":telefone",$aluno->telefone,PDO::PARAM_STR);
+            $statement->bindValue(":matricula",$aluno->matricula,PDO::PARAM_STR);
+            $statement->bindValue(":curso",$aluno->curso,PDO::PARAM_INT);
+            $statement->bindValue(":faculdade",$aluno->faculdade,PDO::PARAM_INT);
             $statement->execute();
 
             if($statement->rowCount() > 0 ) {

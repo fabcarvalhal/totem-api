@@ -23,7 +23,7 @@ class Cursos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM Cursos WHERE id = :id");
-            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 

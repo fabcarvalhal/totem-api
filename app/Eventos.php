@@ -21,8 +21,8 @@ class Eventos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM :eventname WHERE id = :id LIMIT 1");
-            $statement->bind_param(":eventname", $eventName, PDO::PARAM_STR);
-            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement->bindValue(":eventname", $eventName, PDO::PARAM_STR);
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -49,7 +49,7 @@ class Eventos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("SELECT nome FROM Eventos WHERE id = :id LIMIT 1");
-            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -76,7 +76,7 @@ class Eventos {
         try {
             $conexao = Conexao::getConnection();
             $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM Eventos WHERE id = :id");
-            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 

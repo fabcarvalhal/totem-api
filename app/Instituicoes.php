@@ -4,7 +4,7 @@ class Instituicoes {
     public static function getAll() {  
         try {
             $Conexao    = Conexao::getConnection();
-            $query      = $Conexao->query("SELECT * FROM Instituição ");
+            $query      = $Conexao->query("SELECT * FROM instituicao ");
             $instituicoes   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($instituicoes); 
         } catch(Exception $e) {
@@ -20,8 +20,8 @@ class Instituicoes {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM Instituição WHERE id = :id");
-            $statement->bind_param(":id", $id, PDO::PARAM_INT);
+            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM instituicao WHERE id = :id");
+            $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -31,9 +31,10 @@ class Instituicoes {
             }
 
             $response->error = true;
-            $response->message = "Não foi possível checar a instituição.";
+            $response->message = "Instituição não existe";
             return $response;
         } catch(Exception $e) {
+            echo json_encode($e);
             $response->error = true;
             $response->message = "Não foi possível checar a instituição.";
             return $response;
