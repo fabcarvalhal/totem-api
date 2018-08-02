@@ -16,15 +16,17 @@ class Inscricao {
     
     
     /*
-    Checa se todas as chaves existem no input
-    Retorna um objeto com error, message
+        Checa se todas as chaves existem e não são nulas no input
     */
     private function validateInput(array $input) {        
         $response = new StdClass();
-        $response->error = null;
+        $response->error = false;
         $response->message = "";
-        $missing = array_diff_key(array_flip($this->requiredKeys), $input);
         
+        $flipRequiredKeys = array_flip($this->requiredKeys);
+        $missing = array_diff_key($flipRequiredKeys, $input);
+
+
         if(sizeof($missing) > 0) {
             $response->error = true;
             $missingKeys = array_map(function($miss){
@@ -34,6 +36,23 @@ class Inscricao {
             $response->message = "Os seguintes dados estão faltando: ".implode(",",$missingKeys);
             return $response;
         }
+
+
+        $invalidValues = [];
+        foreach($this->requiredKeys as $val) {
+            if(array_key_exists($val, $input)){
+                if(is_null($input[$val])  || $input[$val] == "") {
+                    $invalidValues[] = $val;
+                }
+            }
+        }
+
+        if(sizeof($invalidValues) > 0 ) {
+            $response->error = true;
+            $response->message = "Os seguiintes dados não podem ser nulos ou vazios: ".implode(",", $invalidValues);
+            return $response;
+        }
+
         $response->error = false;
         return $response;
     }
