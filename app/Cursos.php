@@ -33,7 +33,7 @@ class Cursos {
             }
 
             $response->error = true;
-            $response->message = "Não foi possível checar o curso.";
+            $response->message = "Curso não existe.";
             return $response;
         } catch(Exception $e) {
             $response->error = true;

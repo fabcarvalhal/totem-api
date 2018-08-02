@@ -15,15 +15,15 @@ class Alunos {
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
             if($result->contagem > 0) {
-                $response->error = false;
+                $response->error = true;
                 return $response;
             }
 
-            $response->error = true;
+            $response->error = false;
             $response->message = "Não foi possível checar o aluno.";
             return $response;
         } catch(Exception $e) {
-            $response->error = true;
+            $response->error = false;
             $response->message = "Não foi possível checar o aluno.";
             return $response;
         }
@@ -37,7 +37,7 @@ class Alunos {
         
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("INSERT INTO alunos(nome,email,telefone,matricula,curso,id_instituição) VALUES(:nome,:email,:telefone,:matricula,:curso,:faculdade)");
+            $statement = $conexao->prepare("INSERT INTO alunos(nome,email,telefone,matricula,curso,faculdade) VALUES(:nome,:email,:telefone,:matricula,:curso,:faculdade)");
             $statement->bindValue(":nome",$aluno->nome,PDO::PARAM_STR);
             $statement->bindValue(":email",$aluno->email,PDO::PARAM_STR);
             $statement->bindValue(":telefone",$aluno->telefone,PDO::PARAM_STR);

@@ -4,7 +4,7 @@ class Eventos {
         try{
 
             $Conexao    = Conexao::getConnection();
-            $query      = $Conexao->query("SELECT * FROM Eventos ");
+            $query      = $Conexao->query("SELECT id,nome FROM Eventos WHERE data >= getutcdate()");
             $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($eventos);
         
@@ -20,9 +20,9 @@ class Eventos {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM :eventname WHERE id = :id LIMIT 1");
-            $statement->bindValue(":eventname", $eventName, PDO::PARAM_STR);
-            $statement->bindValue(":id", $id, PDO::PARAM_INT);
+            $query = sprintf("SELECT COUNT(1) AS contagem FROM %s WHERE aluno = :id", $eventName);
+            $statement = $conexao->prepare($query);
+            $statement->bindValue(":id", $studentId, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -35,6 +35,7 @@ class Eventos {
             $response->error = false;
             return $response;
         } catch(Exception $e) {
+            echo $e->getMessage();
             $response->error = true;
             $response->message = "Erro ao checar se o aluno já se inscreveu";
             return $response;
@@ -48,14 +49,14 @@ class Eventos {
         $response->eventName= null;
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT nome FROM Eventos WHERE id = :id LIMIT 1");
+            $statement = $conexao->prepare("SELECT nome FROM eventos WHERE id = :id order by id desc offset 0 rows fetch next 1 rows only");
             $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
-            $result = $statement->fetch(PDO::FETCH_OBJ);
-
+            $result = $statement->fetchAll(PDO::FETCH_OBJ);
+            
             if($statement->rowCount() > 0) {
                 $response->error = false;
-                $response->eventName = $result->nome;
+                $response->eventName = $result[0]->nome;
                 return $response;
             }
 
@@ -63,6 +64,7 @@ class Eventos {
             $response->message = "O evento não existe.";
             return $response;
         } catch(Exception $e) {
+            echo $e->getMessage();
             $response->error = true;
             $response->message = "Erro ao checar evento.";
             return $response;
@@ -86,7 +88,7 @@ class Eventos {
             }
 
             $response->error = true;
-            $response->message = "Não foi possível checar o evento.";
+            $response->message = "O evento não existe.";
             return $response;
         } catch(Exception $e) {
             $response->error = true;

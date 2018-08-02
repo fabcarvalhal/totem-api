@@ -1,12 +1,12 @@
 <?php 
 
 class AlunoDTO {
-    $nome;
-    $matricula;
-    $telefone;
-    $curso;
-    $faculdade;
-    $email;
+    public $nome;
+    public $matricula;
+    public $telefone;
+    public $curso;
+    public $faculdade;
+    public $email;
 
     function __construct($nome,$matricula,$telefone,$curso,$faculdade,$email) {
         $this->nome = $nome;
