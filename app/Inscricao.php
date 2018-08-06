@@ -109,7 +109,7 @@ class Inscricao {
         if(sizeof($missing) > 0) {
             $response->error = true;
             $missingKeys = array_map(function($miss){
-              return $this->requiredKeys[$miss];
+              return str_replace("id_","",$this->requiredKeys[$miss]);
             },$missing); 
             
             $response->message = "Os seguintes dados estão faltando: ".implode(",",$missingKeys);
@@ -121,7 +121,7 @@ class Inscricao {
         foreach($this->requiredKeys as $val) {
             if(array_key_exists($val, $input)){
                 if(is_null($input[$val])  || $input[$val] == "") {
-                    $invalidValues[] = $val;
+                    $invalidValues[] = str_replace("id_","",$val);
                 }
             }
         }
