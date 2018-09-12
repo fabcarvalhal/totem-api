@@ -1,6 +1,5 @@
 <?php 
-
-//tcp:totem-bd.database.windows.net
+// Constantes de conexao, mudar de acordo com o banco, ususario e host que for utilizar
 define('DB_HOST'        , "DESKTOP-JASFL06\SQLEXPRESS");
 define('DB_USER'        , "sa");
 define('DB_PASSWORD'    , "123");
