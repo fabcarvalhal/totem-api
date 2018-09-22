@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `totem`.`instituicao` (
   `nome_faculdade` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
+AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `totem`.`cursos` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
+AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -56,15 +56,17 @@ DEFAULT CHARACTER SET = utf8;
 CREATE TABLE IF NOT EXISTS `totem`.`alunos` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(255) NOT NULL,
+  `cpf` VARCHAR(45) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
   `telefone` VARCHAR(16) NOT NULL,
-  `matricula` VARCHAR(40) NOT NULL,
-  `curso` INT(11) NOT NULL,
-  `faculdade` INT(11) NOT NULL,
+  `matricula` VARCHAR(40) NULL DEFAULT NULL,
+  `curso` INT(11) NULL DEFAULT NULL,
+  `faculdade` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC),
   UNIQUE INDEX `MATRICULA` (`matricula` ASC),
-  INDEX `FK_alunos_instituicao` (`faculdade` ASC),
   INDEX `FK_alunos_cursos` (`curso` ASC),
+  INDEX `FK_alunos_instituicao` (`faculdade` ASC),
   CONSTRAINT `FK_alunos_cursos`
     FOREIGN KEY (`curso`)
     REFERENCES `totem`.`cursos` (`id`)
@@ -97,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `totem`.`eventos` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
+AUTO_INCREMENT = 7
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -123,19 +125,6 @@ CREATE TABLE IF NOT EXISTS `totem`.`eventos_alunos` (
     REFERENCES `totem`.`eventos` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `totem`.`tecweek`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `totem`.`tecweek` (
-  `aluno` BIGINT(20) NOT NULL,
-  `nome_aluno` VARCHAR(255) NOT NULL,
-  `checkin` TINYINT(1) NOT NULL,
-  `checkout` TINYINT(1) NOT NULL,
-  UNIQUE INDEX `IX_Tecweek` (`aluno` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
