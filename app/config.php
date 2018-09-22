@@ -1,4 +1,6 @@
 <?php 
+date_default_timezone_set("America/Bahia");
+
 //Registra todas as classes no flight, para que seja possível chamar direto por ele o método necessário
 Flight::register('Eventos','Eventos');
 Flight::register('Instituicoes','Instituicoes');

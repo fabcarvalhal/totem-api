@@ -1,11 +1,11 @@
 <?php 
-// Constantes de conexao, mudar de acordo com o banco, ususario e host que for utilizar
-define('DB_HOST'        , "DESKTOP-JASFL06\SQLEXPRESS");
-define('DB_USER'        , "sa");
-define('DB_PASSWORD'    , "123");
+
+define('DB_HOST'        , "127.0.0.1");
+define('DB_USER'        , "root");
+define('DB_PASSWORD'    , "root");
 define('DB_NAME'        , "totem");
-define('DB_DRIVER'      , "sqlsrv");
-// define('DB_PORT'        , "1433"); //descomentar para conectar ao banco no azure
+define('DB_DRIVER'      , "mysql");
+define('DB_PORT'        , '3306');
 
 class Conexao {
     private static $connection;
@@ -14,13 +14,13 @@ class Conexao {
         
         public static function getConnection() {
             
-            $pdoConfig  = DB_DRIVER . ":". "server = " . DB_HOST;
+            $pdoConfig  = DB_DRIVER . ":". "server=" . DB_HOST;
+            
             if (defined("DB_PORT")){
                 $pdoConfig .="," . DB_PORT;
             }
             $pdoConfig .= ";";
-            $pdoConfig .= "database=".DB_NAME.";";
-            
+            $pdoConfig .= "dbname=".DB_NAME.";";
             try {
                 if(!isset($connection)){
                     $connection =  new PDO($pdoConfig, DB_USER, DB_PASSWORD);
