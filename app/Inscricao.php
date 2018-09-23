@@ -22,7 +22,7 @@ class Inscricao {
         if($validatePerson->exists == false) {
 
             $studentData = new DadosEstudante(null,null,null);
-            if($inputAsObject->matricula != null && $inputAsObject->matricula != "") {
+            if(property_exists($inputAsObject, 'matricula') && $inputAsObject->matricula != "") {
                 $studentData->matricula = $inputAsObject->matricula;
                 $studentData->curso     = $inputAsObject->id_curso;
                 $studentData->faculdade = $inputAsObject->id_faculdade;
@@ -102,23 +102,22 @@ class Inscricao {
         $response->error = false;
         $response->message = "";
 
-        $requeridos = array();
+        $requiredKeys = array();
         
         if(isset($input['matricula']) && $input['matricula'] != '') {
-            $requeridos = array_merge($this->requiredKeysForStudent, $this->requiredKeys);
-            echo 'caiu nessa desgraça aqui';
+            $requiredKeys = array_merge($this->requiredKeysForStudent, $this->requiredKeys);
         } else {
             
-            $requeridos = $this->requiredKeys;
+            $requiredKeys = $this->requiredKeys;
         }
 
-        $flipRequiredKeys = array_flip($requeridos);
+        $flipRequiredKeys = array_flip($requiredKeys);
         $missing = array_diff_key($flipRequiredKeys, $input);
 
         if(sizeof($missing) > 0) {
             $response->error = true;
             $missingKeys = array_map(function($miss){
-              return str_replace("id_","",$requeridos[$miss]);
+              return str_replace("id_","",$requiredKeys[$miss]);
             },$missing); 
             
             $response->message = "Os seguintes dados estão faltando: ".implode(",",$missingKeys);
@@ -127,7 +126,7 @@ class Inscricao {
 
 
         $invalidValues = [];
-        foreach($requeridos as $val) {
+        foreach($requiredKeys as $val) {
             if(array_key_exists($val, $input)){
                 if(is_null($input[$val])  || $input[$val] == "") {
                     $invalidValues[] = str_replace("id_","",$val);
