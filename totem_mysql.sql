@@ -51,38 +51,6 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `totem`.`alunos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `totem`.`alunos` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(255) NOT NULL,
-  `cpf` VARCHAR(45) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `telefone` VARCHAR(16) NOT NULL,
-  `matricula` VARCHAR(40) NULL DEFAULT NULL,
-  `curso` INT(11) NULL DEFAULT NULL,
-  `faculdade` INT(11) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC),
-  UNIQUE INDEX `MATRICULA` (`matricula` ASC),
-  INDEX `FK_alunos_cursos` (`curso` ASC),
-  INDEX `FK_alunos_instituicao` (`faculdade` ASC),
-  CONSTRAINT `FK_alunos_cursos`
-    FOREIGN KEY (`curso`)
-    REFERENCES `totem`.`cursos` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `FK_alunos_instituicao`
-    FOREIGN KEY (`faculdade`)
-    REFERENCES `totem`.`instituicao` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-AUTO_INCREMENT = 2
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
 -- Table `totem`.`eventos`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `totem`.`eventos` (
@@ -104,28 +72,61 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `totem`.`eventos_alunos`
+-- Table `totem`.`pessoas`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `totem`.`eventos_alunos` (
-  `id_checkin` INT(11) NOT NULL AUTO_INCREMENT,
-  `id_aluno` INT(11) NOT NULL,
-  `id_evento` INT(11) NOT NULL,
-  `data_checkin` DATETIME NULL DEFAULT NULL,
-  `data_checkout` DATETIME NULL DEFAULT NULL,
-  PRIMARY KEY (`id_checkin`),
-  INDEX `id_evento` (`id_evento` ASC),
-  INDEX `id_aluno` (`id_aluno` ASC),
-  CONSTRAINT `id_alunofk`
-    FOREIGN KEY (`id_aluno`)
-    REFERENCES `totem`.`alunos` (`id`)
+CREATE TABLE IF NOT EXISTS `totem`.`pessoas` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(255) NOT NULL,
+  `cpf` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `telefone` VARCHAR(16) NOT NULL,
+  `matricula` VARCHAR(40) NULL DEFAULT NULL,
+  `curso` INT(11) NULL DEFAULT NULL,
+  `faculdade` INT(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC),
+  INDEX `FK_alunos_cursos` (`curso` ASC),
+  INDEX `FK_alunos_instituicao` (`faculdade` ASC),
+  CONSTRAINT `FK_alunos_cursos`
+    FOREIGN KEY (`curso`)
+    REFERENCES `totem`.`cursos` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
+  CONSTRAINT `FK_alunos_instituicao`
+    FOREIGN KEY (`faculdade`)
+    REFERENCES `totem`.`instituicao` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 13
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `totem`.`eventos_pessoas_inscricoes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `totem`.`eventos_pessoas_inscricoes` (
+  `id_inscricao` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_pessoa` INT(11) NOT NULL,
+  `id_evento` INT(11) NOT NULL,
+  `data_inscricao` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_checkin` DATETIME NULL DEFAULT NULL,
+  `data_checkout` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`id_inscricao`),
+  INDEX `id_evento` (`id_evento` ASC),
+  INDEX `id_aluno` (`id_pessoa` ASC),
   CONSTRAINT `id_eventofk`
     FOREIGN KEY (`id_evento`)
     REFERENCES `totem`.`eventos` (`id`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_pessoafk`
+    FOREIGN KEY (`id_pessoa`)
+    REFERENCES `totem`.`pessoas` (`id`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
+AUTO_INCREMENT = 16
 DEFAULT CHARACTER SET = utf8;
 
 
