@@ -4,7 +4,6 @@ class Eventos {
         try{
 
             $Conexao    = Conexao::getConnection();
-            // $query      = $Conexao->query("SELECT id,nome FROM Eventos WHERE data_ini >= NOW() AND data_fim <= NOW()");
             $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao WHERE eventos.faculdade = instituicao.id");
             $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($eventos);
@@ -121,15 +120,15 @@ class Eventos {
         }
     }
 
-    public static function checkStudentHasSubscribed($studentId,$eventName) {
+    public static function checkPersonHasSubscribed($cpf,$eventId) {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $query = sprintf("SELECT COUNT(1) AS contagem FROM %s WHERE aluno = :id", $eventName);
-            $statement = $conexao->prepare($query);
-            $statement->bindValue(":id", $studentId, PDO::PARAM_INT);
+            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem, id_pessoa FROM eventos_pessoas_inscricoes WHERE id_pessoa = (SELECT id FROM pessoas WHERE cpf= :cpf) AND id_evento = :idevento");
+            $statement->bindValue(":cpf", $cpf, PDO::PARAM_STR);
+            $statement->bindValue(":idevento", $eventId, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -142,38 +141,8 @@ class Eventos {
             $response->error = false;
             return $response;
         } catch(Exception $e) {
-            echo $e->getMessage();
             $response->error = true;
             $response->message = "Erro ao checar se o aluno já se inscreveu";
-            return $response;
-        }
-    }
-
-    public static function getEventNameById($id) {
-        $response = new StdClass();
-        $response->error = false;
-        $response->message = "";
-        $response->eventName= null;
-        try {
-            $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT nome FROM eventos WHERE id = :id order by id desc offset 0 rows fetch next 1 rows only");
-            $statement->bindValue(":id", $id, PDO::PARAM_INT);
-            $statement->execute();
-            $result = $statement->fetchAll(PDO::FETCH_OBJ);
-            
-            if($statement->rowCount() > 0) {
-                $response->error = false;
-                $response->eventName = $result[0]->nome;
-                return $response;
-            }
-
-            $response->error = true;
-            $response->message = "O evento não existe.";
-            return $response;
-        } catch(Exception $e) {
-            echo $e->getMessage();
-            $response->error = true;
-            $response->message = "Erro ao checar evento.";
             return $response;
         }
     }

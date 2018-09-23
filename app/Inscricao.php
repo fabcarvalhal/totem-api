@@ -1,9 +1,9 @@
 <?php 
-include_once "DTO/AlunoDTO.php";
 
 class Inscricao {
     
-    private  $requiredKeys =  array('id_faculdade','id_curso','matricula','telefone','nome','id_evento','email');
+    private  $requiredKeys =  array('cpf','telefone','nome','id_evento','email');
+    private  $requiredKeysForStudent = array('id_curso','id_faculdade');
 
     public function inscrever(array $input) {
         $validateInput = $this->validateInput($input);
@@ -12,50 +12,51 @@ class Inscricao {
             return;
         }
         $inputAsObject = (object) $input;
-        $validateInstituition = Instituicoes::checkIfExists($inputAsObject->id_faculdade);
-        if($validateInstituition->error) {
-            echo json_encode($validateInstituition);
-            return;
-        }
-        
-        $validateCourse = Cursos::checkIfExists($inputAsObject->id_curso);
-        if($validateCourse->error) {
-            echo json_encode($validateCourse);
-            return;
-        }
 
         $validateEvent = Eventos::checkIfExists($inputAsObject->id_evento);
         if($validateEvent->error) {
             echo json_encode($validateEvent);
             return;
         }
+        $validatePerson = Pessoas::checkIfExists($inputAsObject->cpf);
+        if($validatePerson->exists == false) {
 
-        $getEventName = Eventos::getEventNameById($inputAsObject->id_evento);
-        if($getEventName->error) {
-            echo json_encode($getEventName);
-            return;
-        }
+            $studentData = new DadosEstudante(null,null,null);
+            if($inputAsObject->matricula != null && $inputAsObject->matricula != "") {
+                $studentData->matricula = $inputAsObject->matricula;
+                $studentData->curso     = $inputAsObject->id_curso;
+                $studentData->faculdade = $inputAsObject->id_faculdade;
 
-        $checkHasSubscribed = Eventos::checkStudentHasSubscribed($inputAsObject->matricula, $getEventName->eventName);
-        if($checkHasSubscribed->error) {
-            echo json_encode($checkHasSubscribed);
-            return;
-        }
-
-        $validateStudent = Alunos::checkIfExists($inputAsObject->matricula);
-        if($validateStudent->error == true) {
-            $student = new AlunoDTO(
+                $validateInstituition = Instituicoes::checkIfExists($inputAsObject->id_faculdade);
+                if($validateInstituition->error) {
+                    echo json_encode($validateInstituition);
+                    return;
+                }
+                
+                $validateCourse = Cursos::checkIfExists($inputAsObject->id_curso);
+                if($validateCourse->error) {
+                    echo json_encode($validateCourse);
+                    return;
+                }
+            }
+            
+            $person = new Pessoa(
                 $inputAsObject->nome,
-                $inputAsObject->matricula,
+                $studentData,
                 $inputAsObject->telefone,
-                $inputAsObject->id_curso,
-                $inputAsObject->id_faculdade,
-                $inputAsObject->email
+                $inputAsObject->email,
+                $inputAsObject->cpf
             );
 
-            $insertStudent = Alunos::cadastrar($student);
-            if($insertStudent->error) {
-                echo json_encode($insertStudent);
+            $insertPerson = Pessoas::cadastrar($person);
+            if($insertPerson->error) {
+                echo json_encode($insertPerson);
+                return;
+            }
+        } else {
+            $checkHasSubscribed = Eventos::checkPersonHasSubscribed($inputAsObject->cpf, $inputAsObject->id_evento);
+            if($checkHasSubscribed->error) {
+                echo json_encode($checkHasSubscribed);
                 return;
             }
         }
@@ -65,10 +66,9 @@ class Inscricao {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $query = sprintf("INSERT INTO %s (aluno,nome_aluno,checkin,checkout) VALUES(:matricula,:nomealuno,0,0)", $getEventName->eventName);
-            $statement = $conexao->prepare($query);
-            $statement->bindValue(":matricula", $inputAsObject->matricula, PDO::PARAM_INT);
-            $statement->bindValue(":nomealuno", $inputAsObject->nome, PDO::PARAM_STR);
+            $statement = $conexao->prepare("INSERT INTO eventos_pessoas_inscricoes (id_pessoa,id_evento) VALUES((SELECT id FROM pessoas WHERE cpf = :cpf),:id_evento)");
+            $statement->bindValue(":cpf", $inputAsObject->cpf, PDO::PARAM_STR);
+            $statement->bindValue(":id_evento", $inputAsObject->id_evento, PDO::PARAM_STR);
             $statement->execute();
 
             if($statement->rowCount() > 0) {
@@ -101,15 +101,24 @@ class Inscricao {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";
-        
-        $flipRequiredKeys = array_flip($this->requiredKeys);
-        $missing = array_diff_key($flipRequiredKeys, $input);
 
+        $requeridos = array();
+        
+        if(isset($input['matricula']) && $input['matricula'] != '') {
+            $requeridos = array_merge($this->requiredKeysForStudent, $this->requiredKeys);
+            echo 'caiu nessa desgraça aqui';
+        } else {
+            
+            $requeridos = $this->requiredKeys;
+        }
+
+        $flipRequiredKeys = array_flip($requeridos);
+        $missing = array_diff_key($flipRequiredKeys, $input);
 
         if(sizeof($missing) > 0) {
             $response->error = true;
             $missingKeys = array_map(function($miss){
-              return str_replace("id_","",$this->requiredKeys[$miss]);
+              return str_replace("id_","",$requeridos[$miss]);
             },$missing); 
             
             $response->message = "Os seguintes dados estão faltando: ".implode(",",$missingKeys);
@@ -118,7 +127,7 @@ class Inscricao {
 
 
         $invalidValues = [];
-        foreach($this->requiredKeys as $val) {
+        foreach($requeridos as $val) {
             if(array_key_exists($val, $input)){
                 if(is_null($input[$val])  || $input[$val] == "") {
                     $invalidValues[] = str_replace("id_","",$val);
