@@ -138,11 +138,12 @@ class Eventos {
                 return $response;
             }
 
+            $response->message = "Pessao não inscrita neste evento";
             $response->error = false;
             return $response;
         } catch(Exception $e) {
             $response->error = true;
-            $response->message = "Erro ao checar se o aluno já se inscreveu";
+            $response->message = "Erro ao checar se a pessoa já se inscreveu";
             return $response;
         }
     }

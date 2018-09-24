@@ -38,6 +38,15 @@ Flight::route('POST /inscrever', function(){
     Flight::Inscricao()->inscrever(Flight::request()->data->getData());
 });
 
+Flight::route('POST /checkin', function(){
+    Flight::PessoaEvento()->checkin(Flight::request()->data->getData());
+});
+
+Flight::route('POST /checkout', function(){
+    Flight::PessoaEvento()->checkout(Flight::request()->data->getData());
+});
+
+
 // ADM Endpoints
 
 Flight::route('POST /adm/instituicao/cadastrar', function() {
