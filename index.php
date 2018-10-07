@@ -9,7 +9,7 @@ Flight::route('/', function(){
 });
 
 Flight::route('GET /eventos', function(){
-    Flight::Eventos()->getAll();  
+    Flight::Eventos()->getNextEvents();  
 });
 
 Flight::route('GET /instituicoes', function(){
@@ -71,6 +71,10 @@ Flight::route('POST /adm/evento/cadastrar', function() {
 
 Flight::route('POST /adm/evento/editar', function() {
     Flight::Eventos()->editar(Flight::request()->data->getData());
+});
+
+Flight::route('GET /adm/eventos', function(){
+    Flight::Eventos()->getAll();  
 });
 
 Flight::start();

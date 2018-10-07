@@ -14,6 +14,19 @@ class Eventos {
         }
     }
 
+    public function getNextEvents() {
+        try{
+            $Conexao    = Conexao::getConnection();
+            $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao WHERE eventos.faculdade = instituicao.id AND eventos.data_ini >= NOW()");
+            $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
+            echo json_encode($eventos);
+        
+        }catch(Exception $e){
+            echo $e->getMessage();
+            exit;
+        }
+    }
+
     public function cadastrar($input) {
         $response = new StdClass();
         $response->error = false;

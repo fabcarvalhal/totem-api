@@ -5,7 +5,7 @@ class Cursos {
         try{
             
             $Conexao    = Conexao::getConnection();
-            $query      = $Conexao->query("SELECT * FROM Cursos ");
+            $query      = $Conexao->query("SELECT cursos.id,nome,area, instituicao.nome_faculdade  FROM cursos INNER JOIN instituicao WHERE cursos.faculdade = instituicao.id ");
             $instituicoes   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($instituicoes);
             
@@ -118,7 +118,7 @@ class Cursos {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM Cursos WHERE id = :id");
+            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM cursos WHERE id = :id");
             $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
