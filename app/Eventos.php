@@ -4,7 +4,21 @@ class Eventos {
         try{
 
             $Conexao    = Conexao::getConnection();
-            $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao WHERE eventos.faculdade = instituicao.id");
+            $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao ON eventos.faculdade = instituicao.id");
+            $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
+            echo json_encode($eventos);
+        
+        }catch(Exception $e){
+            echo $e->getMessage();
+            exit;
+        }
+    }
+
+    public static function getOngoingEvents() {
+        try{
+
+            $Conexao    = Conexao::getConnection();
+            $query      = $Conexao->query("SELECT eventos.id,nome FROM eventos WHERE eventos.data_ini <= NOW() AND eventos.data_fim >= NOW()");
             $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($eventos);
         
@@ -17,7 +31,7 @@ class Eventos {
     public function getNextEvents() {
         try{
             $Conexao    = Conexao::getConnection();
-            $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao WHERE eventos.faculdade = instituicao.id AND eventos.data_ini >= NOW()");
+            $query      = $Conexao->query("SELECT eventos.id,nome,instituicao.nome_faculdade AS faculdade ,data_ini AS inicio, data_fim AS fim FROM eventos INNER JOIN instituicao ON eventos.faculdade = instituicao.id WHERE eventos.data_ini >= NOW()");
             $eventos   = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($eventos);
         
@@ -38,11 +52,12 @@ class Eventos {
 
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("INSERT INTO eventos (nome,faculdade,data_ini,data_fim) VALUES (:nome,:faculdade,:data_ini,:data_fim)");
+            $statement = $conexao->prepare("INSERT INTO eventos (nome,faculdade,data_ini,data_fim,descricao) VALUES (:nome,:faculdade,:data_ini,:data_fim,:descricao)");
             $statement->bindValue(":nome", $objecInput->nome);
             $statement->bindValue(":faculdade", $objecInput->faculdade);
             $statement->bindValue(":data_ini", $startDateCurrentTimezone);
             $statement->bindValue(":data_fim", $endDateCurrentTimezone);
+            $statement->bindValue(":descricao", $objecInput->descricao);
             $statement->execute();
 
             if($statement->rowCount() > 0) {
@@ -80,11 +95,12 @@ class Eventos {
 
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("UPDATE eventos SET nome=:nome,faculdade=:faculdade,data_ini=:data_ini,data_fim=:data_fim WHERE id=:id");
+            $statement = $conexao->prepare("UPDATE eventos SET nome=:nome,faculdade=:faculdade,data_ini=:data_ini,data_fim=:data_fim,descricao=:descricao WHERE id=:id");
             $statement->bindValue(":nome", $objecInput->nome);
             $statement->bindValue(":faculdade", $objecInput->faculdade);
             $statement->bindValue(":data_ini", $startDateCurrentTimezone);
             $statement->bindValue(":data_fim", $endDateCurrentTimezone);
+            $statement->bindValue(":descricao", $objecInput->descricao);
             $statement->bindValue(":id", $objecInput->id);
 
             if($statement->execute()){
@@ -111,7 +127,7 @@ class Eventos {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT nome, data_ini AS inicio, data_fim AS fim, faculdade FROM eventos WHERE id = :id");
+            $statement = $conexao->prepare("SELECT nome, data_ini AS inicio, data_fim AS fim, faculdade, descricao, nome_faculdade FROM eventos INNER JOIN instituicao ON instituicao.id = eventos.id  WHERE eventos.id = :id");
             $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_OBJ);

@@ -12,6 +12,10 @@ Flight::route('GET /eventos', function(){
     Flight::Eventos()->getNextEvents();  
 });
 
+Flight::route('GET /ongoingEvents', function(){
+    Flight::Eventos()->getOngoingEvents();  
+});
+
 Flight::route('GET /instituicoes', function(){
     Flight::Instituicoes()->getAll();  
 });
