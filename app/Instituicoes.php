@@ -113,7 +113,7 @@ class Instituicoes {
     }
     
 
-    public function checkIfExists($id) {
+    public static function checkIfExists($id) {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";

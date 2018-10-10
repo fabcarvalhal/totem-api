@@ -4,7 +4,7 @@ include_once 'DTO/Pessoa.php';
 
 class Pessoas {
 
-    public function checkIfExists($cpf) {
+    public static function checkIfExists($cpf) {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";
@@ -31,7 +31,7 @@ class Pessoas {
         
     }
 
-    public function cadastrar(Pessoa $aluno) {
+    public static function cadastrar(Pessoa $aluno) {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";

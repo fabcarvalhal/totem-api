@@ -127,7 +127,7 @@ class Eventos {
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT nome, data_ini AS inicio, data_fim AS fim, faculdade, descricao, nome_faculdade FROM eventos INNER JOIN instituicao ON instituicao.id = eventos.id  WHERE eventos.id = :id");
+            $statement = $conexao->prepare("SELECT nome, data_ini AS inicio, data_fim AS fim, faculdade, descricao, nome_faculdade FROM eventos INNER JOIN instituicao ON instituicao.id = eventos.faculdade  WHERE eventos.id = :id");
             $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_OBJ);
@@ -177,13 +177,13 @@ class Eventos {
         }
     }
 
-    public function checkIfExists($id) {
+    public static function checkIfExists($id) {
         $response = new StdClass();
         $response->error = false;
         $response->message = "";
         try {
             $conexao = Conexao::getConnection();
-            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM Eventos WHERE id = :id");
+            $statement = $conexao->prepare("SELECT COUNT(1) AS contagem FROM eventos WHERE id = :id");
             $statement->bindValue(":id", $id, PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetch(PDO::FETCH_OBJ);
